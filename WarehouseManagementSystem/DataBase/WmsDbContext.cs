@@ -2,13 +2,10 @@
 
 namespace WarehouseManagementSystem.DataBase;
 
-public class WmsDbContext : DbContext
+public class WmsDbContext(DbContextOptions<WmsDbContext> options) : DbContext(options)
 {
     public DbSet<Item> Items { get; set; }
 
-    public WmsDbContext(DbContextOptions<WmsDbContext> options) : base(options)
-    {
-    }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.LogTo(

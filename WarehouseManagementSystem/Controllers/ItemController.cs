@@ -5,27 +5,41 @@ namespace WarehouseManagementSystem.Controllers;
 
 [ApiController]
 [Route("api/item")]
-public class ItemController : ControllerBase
+public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
 {
-    private readonly WmsDbContext _wmsDbContext;
-    
-    public ItemController(WmsDbContext wmsDbContext)
-    {
-        _wmsDbContext = wmsDbContext;
-    }
-
-
     [HttpGet]
-    public List<Item> GetItems()
+    public IEnumerable<Item> GetItems()
     {
-        return _wmsDbContext.Items.ToList();
+        return wmsDbContext.Items.ToList();
     }
 
     [HttpPost]
     public IActionResult CreateItem(Item item)
     {
-        _wmsDbContext.Add(item);
-        _wmsDbContext.SaveChanges();
-        return Ok(_wmsDbContext.Add(item).Entity);
+        if (wmsDbContext.Items.FirstOrDefault(i => i.Id == item.Id) != null)
+        {
+            return BadRequest("Item with this id already exist");
+        }
+        
+        wmsDbContext.Add(item);
+        wmsDbContext.SaveChanges();
+        return Ok(wmsDbContext.Add(item).Entity);
+    }
+
+    [HttpDelete]
+    public IActionResult DeleteItem(int id)
+    {
+        var itemForDelete = wmsDbContext.Items.FirstOrDefault(i => i.Id == id);
+        if (itemForDelete == null)
+            return NotFound();
+        wmsDbContext.Items.Remove(itemForDelete);
+        wmsDbContext.SaveChanges(); 
+        return Ok();
+    }
+
+    [HttpPut]
+    public IActionResult UpdateItem(int id, string name, string description, DateTime createdDate)
+    {
+        return Ok();
     }
 }
