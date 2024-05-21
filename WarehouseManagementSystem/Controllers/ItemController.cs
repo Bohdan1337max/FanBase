@@ -38,17 +38,15 @@ public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
     }
 
     [HttpPut]
-    public IActionResult UpdateItem(string name,Item updatedItem)
+    public IActionResult UpdateItem(Item updatedItem)
     {
-        var itemToUpdate = wmsDbContext.Items.FirstOrDefault(i => i.Name == name);
+        var itemToUpdate = wmsDbContext.Items.FirstOrDefault(i => i.Id == updatedItem.Id);
         if (itemToUpdate == null)
-            return NotFound("Item with this name don`t exist");
-        if(updatedItem.Name != null)
-            itemToUpdate.Name = updatedItem.Name;
-        if(updatedItem.Description != null)
-            itemToUpdate.Description = updatedItem.Description;
-        if(updatedItem.CreatedDate != null)
-            itemToUpdate.CreatedDate = updatedItem.CreatedDate;
+            return NotFound("Item don`t exist");
+        
+        itemToUpdate.Name = updatedItem.Name;
+        itemToUpdate.Description = updatedItem.Description;
+        itemToUpdate.CreatedDate = updatedItem.CreatedDate;
         
         wmsDbContext.SaveChanges();
        
