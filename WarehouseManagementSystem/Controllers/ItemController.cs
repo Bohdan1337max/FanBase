@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagementSystem.DataBase;
+using WarehouseManagementSystem.Models;
 
 namespace WarehouseManagementSystem.Controllers;
 

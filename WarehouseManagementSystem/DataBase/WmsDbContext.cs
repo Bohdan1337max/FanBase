@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagementSystem.Models;
 
 namespace WarehouseManagementSystem.DataBase;
 
 public class WmsDbContext(DbContextOptions<WmsDbContext> options) : DbContext(options)
 {
     public DbSet<Item> Items { get; set; }
-
+    public DbSet<User> Users { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.LogTo(
