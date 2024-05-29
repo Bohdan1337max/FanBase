@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagementSystem.DataBase;
 using WarehouseManagementSystem.Models;
@@ -22,7 +23,16 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
     [HttpPost("LogIn")]
     public IActionResult LogIn(UserModel user)
     {
-        return Ok();
+        var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == user.Email);
+        
+        if (userFromDb == null)
+            return BadRequest("User with this Email dont exist");
+        var jwt = authRepository.LogIn(user.Email, user.Password);
+        
+        if (jwt == null)
+            return BadRequest("Password sucks");
+
+        return Ok(jwt);
     }
     
     

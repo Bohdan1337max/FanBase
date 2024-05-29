@@ -16,12 +16,13 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
     public string? RegisterNewUser(string email, string userName, string password)
     {
         //fix salt
+        var hash = HashPassword(password, out var salt);
         var newUser = new Models.User()
         {
             UserName = userName,
             Email = email,
-            Password = password,
-            Salt = "test"
+            Password = hash,
+            Salt = Convert.ToHexString(salt)
         };
 
         var userFormDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
@@ -33,6 +34,13 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         
         var jwt = GenerateToken(email);
         return jwt;
+    }
+
+    public string? LogIn(string email, string password)
+    {
+        var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
+        
+        return !VerifyPassword(password, userFromDb.Password, Convert.FromHexString(userFromDb.Salt)) ? null : GenerateToken(email);
     }
 
     private string HashPassword(string password,out byte[] salt )
