@@ -44,7 +44,7 @@ public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
         return Ok();
     }
 
-    [HttpPut("/{itemId}")]
+    [HttpPut("{itemId}")]
     public IActionResult UpdateItem(int itemId, ItemModelCreate updatedItem)
     {
         var itemToUpdate = wmsDbContext.Items.FirstOrDefault(i => i.Id == itemId);

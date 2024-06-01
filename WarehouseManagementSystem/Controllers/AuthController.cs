@@ -34,6 +34,22 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
 
         return Ok(jwt);
     }
+
+    [HttpGet("ShowUserInfo")]
+    public IActionResult ShowAuthUserData(string email)
+    {
+        var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
+        if (userFromDb == null)
+            return BadRequest("User with this Id doesnt exist");
+
+        var response = new UserInfoResponse()
+        {
+            Id = userFromDb.Id,
+            UserName = userFromDb.UserName,
+            Email = userFromDb.Email,
+        };
+        return Ok(response);
+    }
     
     
 }
