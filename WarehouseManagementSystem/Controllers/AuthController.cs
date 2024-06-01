@@ -11,7 +11,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
 {
 
     [HttpPost("signUp")]
-    public IActionResult SignUp(UserModel user)
+    public IActionResult SignUp(SignUpRequest user)
     {
         var jwt = authRepository.RegisterNewUser(user.Email, user.UserName, user.Password);
         if (jwt == null)
@@ -21,7 +21,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
     }
 
     [HttpPost("LogIn")]
-    public IActionResult LogIn(UserModel user)
+    public IActionResult LogIn(LogInRequest user)
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == user.Email);
         

@@ -15,16 +15,22 @@ public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult CreateItem(Item item)
+    public IActionResult CreateItem(ItemModelCreate itemModelCreate)
     {
-        if (wmsDbContext.Items.FirstOrDefault(i => i.Id == item.Id) != null)
+        // if (wmsDbContext.Items.FirstOrDefault(i => i.Id == item.Id) != null)
+        // {
+        //     return BadRequest("Item with this id already exist");
+        // }
+
+        var item = new Item()
         {
-            return BadRequest("Item with this id already exist");
-        }
-        
+            CreatedDate = DateTime.UtcNow,
+            Name = itemModelCreate.Name,
+            Description = itemModelCreate.Description
+        };
         wmsDbContext.Add(item);
         wmsDbContext.SaveChanges();
-        return Ok(wmsDbContext.Add(item).Entity);
+        return Ok(item);
     }
 
     [HttpDelete]
@@ -38,16 +44,15 @@ public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
         return Ok();
     }
 
-    [HttpPut]
-    public IActionResult UpdateItem(Item updatedItem)
+    [HttpPut("/{itemId}")]
+    public IActionResult UpdateItem(int itemId, ItemModelCreate updatedItem)
     {
-        var itemToUpdate = wmsDbContext.Items.FirstOrDefault(i => i.Id == updatedItem.Id);
+        var itemToUpdate = wmsDbContext.Items.FirstOrDefault(i => i.Id == itemId);
         if (itemToUpdate == null)
             return NotFound("Item don`t exist");
         
         itemToUpdate.Name = updatedItem.Name;
         itemToUpdate.Description = updatedItem.Description;
-        itemToUpdate.CreatedDate = updatedItem.CreatedDate;
         
         wmsDbContext.SaveChanges();
        
