@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagementSystem.DataBase;
 using WarehouseManagementSystem.Models;
 
@@ -14,24 +15,32 @@ public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
         return wmsDbContext.Items.ToList();
     }
 
-    [HttpPost]
-    public IActionResult CreateItem(ItemModelCreate itemModelCreate)
+    
+    [HttpGet("invGet")]
+    public IEnumerable<Inventory> GetInventory()
     {
-        // if (wmsDbContext.Items.FirstOrDefault(i => i.Id == item.Id) != null)
-        // {
-        //     return BadRequest("Item with this id already exist");
-        // }
+        return wmsDbContext.Inventories.Include(i => i.Item).ToList();
+    }
 
+    [HttpPost]
+    public IActionResult CreateItem(ItemCreateRequest itemCreateRequest)
+    {
         var item = new Item()
         {
             CreatedDate = DateTime.UtcNow,
-            Name = itemModelCreate.Name,
-            Description = itemModelCreate.Description
+            Name = itemCreateRequest.Name,
+            Description = itemCreateRequest.Description
         };
-        wmsDbContext.Add(item);
-        wmsDbContext.SaveChanges();
+        wmsDbContext.Items.Add(item);
+        var defaultInventory = new Inventory()
+            { Item = item,Name = itemCreateRequest.DefaultInventoryName, Location = itemCreateRequest.DefaultLocation, Quantity = itemCreateRequest.Quantity };
+
+        wmsDbContext.Inventories.Add(defaultInventory);
+        wmsDbContext.SaveChanges(); 
+
         return Ok(item);
     }
+    
 
     [HttpDelete]
     public IActionResult DeleteItem(int id)
@@ -40,22 +49,22 @@ public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
         if (itemForDelete == null)
             return NotFound();
         wmsDbContext.Items.Remove(itemForDelete);
-        wmsDbContext.SaveChanges(); 
+        wmsDbContext.SaveChanges();
         return Ok();
     }
 
     [HttpPut("{itemId}")]
-    public IActionResult UpdateItem(int itemId, ItemModelCreate updatedItem)
+    public IActionResult UpdateItem(int itemId, ItemCreateRequest updatedItem)
     {
         var itemToUpdate = wmsDbContext.Items.FirstOrDefault(i => i.Id == itemId);
         if (itemToUpdate == null)
             return NotFound("Item don`t exist");
-        
+
         itemToUpdate.Name = updatedItem.Name;
         itemToUpdate.Description = updatedItem.Description;
-        
+
         wmsDbContext.SaveChanges();
-       
+
         return Ok();
     }
 }

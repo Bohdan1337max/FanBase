@@ -6,8 +6,8 @@ namespace WarehouseManagementSystem.Models;
 public class Inventory
 {
     [Column("inventory_id")]public int Id { get; set; }
-    [Column("item")]public int ItemId { get; set; }
-    public List<Item> Items { get; } = new();
+    [Column("item_id")]public int ItemId { get; set; }
+    public Item Item { get; set; }
     [Column("name")]public string? Name { get; set; }
     [Column("description")]public string? Description { get; set; }
     [Column("location")]public string? Location { get; set; }

@@ -32,7 +32,7 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         wmsDbContext.Users.Add(newUser);
         wmsDbContext.SaveChanges();
         
-        var jwt = GenerateToken(email);
+        var jwt = GenerateToken(email,"user");
         return jwt;
     }
 
@@ -40,7 +40,7 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
         
-        return !VerifyPassword(password, userFromDb.Password, Convert.FromHexString(userFromDb.Salt)) ? null : GenerateToken(email);
+        return !VerifyPassword(password, userFromDb.Password, Convert.FromHexString(userFromDb.Salt)) ? null : GenerateToken(email,"user");
     }
 
     private string HashPassword(string password,out byte[] salt )
@@ -62,14 +62,15 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         var hashToCompere = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, hashAlgorithm, keySize);
         return CryptographicOperations.FixedTimeEquals(hashToCompere, Convert.FromHexString(hash));
     }
-    private string GenerateToken(string email)
+    private string GenerateToken(string email,string role)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!);
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Email, email)
+            new(JwtRegisteredClaimNames.Email, email),
+            new("role",role)
         };
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -77,6 +78,8 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
             Expires = DateTime.UtcNow.Add(TokeLifetime),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
         };
+        
+            
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var jwt = tokenHandler.WriteToken(token);
         return jwt;

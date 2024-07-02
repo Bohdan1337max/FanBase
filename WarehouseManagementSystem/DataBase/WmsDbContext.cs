@@ -16,4 +16,10 @@ public class WmsDbContext(DbContextOptions<WmsDbContext> options) : DbContext(op
             action: Console.WriteLine,
             minimumLevel: LogLevel.Information);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        
+    }
+    
 }
