@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagementSystem.DataBase;
@@ -20,7 +21,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         return Ok(jwt);
     }
 
-    [HttpPost("LogIn")]
+    [HttpPost("logIn")]
     public IActionResult LogIn(LogInRequest user)
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == user.Email);
@@ -35,7 +36,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         return Ok(jwt);
     }
 
-    [HttpGet("ShowUserInfo")]
+    [HttpGet("showUserInfo")]
     public IActionResult ShowAuthUserData(string email)
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
@@ -50,6 +51,22 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         };
         return Ok(response);
     }
-    
-    
+
+    [Authorize(Roles = "SuperAdmin")]
+    [HttpPost("roleCreate")]
+    public IActionResult CreateRole(string roleName)
+    {
+        var roleFromDb = wmsDbContext.Roles.FirstOrDefault(r => r.Name == roleName);
+        if (roleFromDb != null)
+            return BadRequest("Role already exist");
+        
+        var newRole = new Role()
+        {
+            Name = roleName
+        };
+        wmsDbContext.Roles.Add(newRole);
+        wmsDbContext.SaveChanges();
+        return Ok($"Role {roleName} successfully created");
+    }
+
 }

@@ -14,7 +14,6 @@ public class ItemController(WmsDbContext wmsDbContext) : ControllerBase
     {
         return wmsDbContext.Items.ToList();
     }
-
     
     [HttpGet("invGet")]
     public IEnumerable<Inventory> GetInventory()

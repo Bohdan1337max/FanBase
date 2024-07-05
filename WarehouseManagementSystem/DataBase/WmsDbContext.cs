@@ -7,7 +7,10 @@ public class WmsDbContext(DbContextOptions<WmsDbContext> options) : DbContext(op
 {
     public DbSet<Item> Items { get; set; }
     public DbSet<User> Users { get; set; }
-
+    
+    public DbSet<Role> Roles { get; set; }
+    
+    public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<Inventory> Inventories { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
