@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagementSystem.DataBase;
+using WarehouseManagementSystem.DataTransferModels;
 using WarehouseManagementSystem.Models;
 using WarehouseManagementSystem.Repositories;
 
@@ -68,5 +70,21 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         wmsDbContext.SaveChanges();
         return Ok($"Role {roleName} successfully created");
     }
+    
+    [HttpPost("assignRole")]
+    public IActionResult AssignRole(int userId, string role)
+    {
+        var user = wmsDbContext.Users.FirstOrDefault(u => u.Id == userId);
 
+        var roleFromDb = wmsDbContext.Roles.FirstOrDefault(r => r.Name == role);
+
+        var userRole = new UserRole() {UserId = user.Id, RoleId = roleFromDb.Id};
+        wmsDbContext.UserRoles.Add(userRole);
+        wmsDbContext.SaveChanges();
+        
+        var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userId).Include(x => x.Role).Select(x => x.Role).ToList();
+        var roles = addedUserRole.Select(r => new AssignRoleResponse() { Id = r.Id, Name = r.Name }).ToList();
+        return Ok(roles);
+    }
+    
 }
