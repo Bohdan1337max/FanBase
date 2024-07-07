@@ -12,14 +12,13 @@ namespace WarehouseManagementSystem.Controllers;
 [Route("api/auth")]
 public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepository) : ControllerBase
 {
-
     [HttpPost("signUp")]
     public IActionResult SignUp(SignUpRequest user)
     {
         var jwt = authRepository.RegisterNewUser(user.Email, user.UserName, user.Password);
         if (jwt == null)
             return BadRequest("User already exist");
-        
+
         return Ok(jwt);
     }
 
@@ -27,11 +26,11 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
     public IActionResult LogIn(LogInRequest user)
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == user.Email);
-        
+
         if (userFromDb == null)
             return BadRequest("User with this Email dont exist");
         var jwt = authRepository.LogIn(user.Email, user.Password);
-        
+
         if (jwt == null)
             return BadRequest("Password sucks");
 
@@ -61,7 +60,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         var roleFromDb = wmsDbContext.Roles.FirstOrDefault(r => r.Name == roleName);
         if (roleFromDb != null)
             return BadRequest("Role already exist");
-        
+
         var newRole = new Role()
         {
             Name = roleName
@@ -70,7 +69,8 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         wmsDbContext.SaveChanges();
         return Ok($"Role {roleName} successfully created");
     }
-    
+
+    //add roles to header   
     [HttpPost("assignRole")]
     public IActionResult AssignRole(int userId, string role)
     {
@@ -78,13 +78,13 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
 
         var roleFromDb = wmsDbContext.Roles.FirstOrDefault(r => r.Name == role);
 
-        var userRole = new UserRole() {UserId = user.Id, RoleId = roleFromDb.Id};
+        var userRole = new UserRole() { UserId = user.Id, RoleId = roleFromDb.Id };
         wmsDbContext.UserRoles.Add(userRole);
         wmsDbContext.SaveChanges();
-        
-        var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userId).Include(x => x.Role).Select(x => x.Role).ToList();
+
+        var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userId).Include(x => x.Role)
+            .Select(x => x.Role).ToList();
         var roles = addedUserRole.Select(r => new AssignRoleResponse() { Id = r.Id, Name = r.Name }).ToList();
         return Ok(roles);
     }
-    
 }
