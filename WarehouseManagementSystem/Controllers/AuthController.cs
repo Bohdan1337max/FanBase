@@ -74,16 +74,10 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
     [HttpPost("assignRole")]
     public IActionResult AssignRole(int userId, string role)
     {
-        var user = wmsDbContext.Users.FirstOrDefault(u => u.Id == userId);
+        var addedUserRole = authRepository.AssignUserRole(userId, role);
 
-        var roleFromDb = wmsDbContext.Roles.FirstOrDefault(r => r.Name == role);
-
-        var userRole = new UserRole() { UserId = user.Id, RoleId = roleFromDb.Id };
-        wmsDbContext.UserRoles.Add(userRole);
-        wmsDbContext.SaveChanges();
-
-        var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userId).Include(x => x.Role)
-            .Select(x => x.Role).ToList();
+        if (addedUserRole.Count == 0)
+            return NotFound("Role with this name don't exist");
         var roles = addedUserRole.Select(r => new AssignRoleResponse() { Id = r.Id, Name = r.Name }).ToList();
         return Ok(roles);
     }

@@ -18,6 +18,8 @@ public class WmsDbContext(DbContextOptions<WmsDbContext> options) : DbContext(op
         optionsBuilder.LogTo(
             action: Console.WriteLine,
             minimumLevel: LogLevel.Information);
+
+        optionsBuilder.EnableSensitiveDataLogging();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

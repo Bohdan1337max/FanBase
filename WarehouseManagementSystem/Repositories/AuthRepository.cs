@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WarehouseManagementSystem.DataBase;
 using WarehouseManagementSystem.DataTransferModels;
+using WarehouseManagementSystem.Models;
 
 namespace WarehouseManagementSystem.Repositories;
 
@@ -16,9 +17,30 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
     private const int iterations = 350000;
     private HashAlgorithmName hashAlgorithm = HashAlgorithmName.SHA512;
 
+
+    public List<Role> AssignUserRole(int userId, string role)
+    {
+        var user = wmsDbContext.Users.FirstOrDefault(u => u.Id == userId);
+
+        var roleFromDb = wmsDbContext.Roles.FirstOrDefault(r => r.Name == role);
+        
+        var userRole = new UserRole() { UserId = user.Id, RoleId = roleFromDb.Id };
+
+        var userRoleFromDb = wmsDbContext.UserRoles.FirstOrDefault(x => x.RoleId == roleFromDb.Id);
+
+        if (userRoleFromDb != null)
+            return new List<Role>();
+        
+        wmsDbContext.UserRoles.Add(userRole);
+        wmsDbContext.SaveChanges();
+        var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userId).Include(x => x.Role)
+            .Select(x => x.Role).ToList();
+      
+        return addedUserRole;
+    }
     public string? RegisterNewUser(string email, string userName, string password)
     {
-        //fix salt
+        var defaultUserRole = wmsDbContext.Roles.FirstOrDefault(x => x.Name == "User");
         var hash = HashPassword(password, out var salt);
         var newUser = new Models.User()
         {
@@ -31,16 +53,14 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
         if (userFromDb != null)
             return null;
-
         
-        var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userFromDb.Id).Include(x => x.Role).Select(x => x.Role).ToList();
-        
-        var roles = addedUserRole.Select(r => r.Name).ToList();
-        
+       
         wmsDbContext.Users.Add(newUser);
         wmsDbContext.SaveChanges();
-
-        var jwt = GenerateToken(email, roles);
+        
+        var assignedRole= AssignUserRole(newUser.Id, defaultUserRole.Name);
+        
+        var jwt = GenerateToken(email, assignedRole);
         return jwt;
     }
 
@@ -49,12 +69,12 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
         var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userFromDb.Id).Include(x => x.Role).Select(x => x.Role).ToList();
         
-        var roles = addedUserRole.Select(r => r.Name).ToList();
+        //var roles = addedUserRole.Select(r => r.Name).ToList();
 
 
         return !VerifyPassword(password, userFromDb.Password, Convert.FromHexString(userFromDb.Salt))
             ? null
-            : GenerateToken(email, roles);
+            : GenerateToken(email, addedUserRole);
     }
 
     private string HashPassword(string password, out byte[] salt)
@@ -77,7 +97,7 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         return CryptographicOperations.FixedTimeEquals(hashToCompere, Convert.FromHexString(hash));
     }
 
-    private string GenerateToken(string email, List<string> roles)
+    private string GenerateToken(string email, List<Role> roles)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!);
@@ -90,7 +110,7 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         
         foreach (var role in roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim(ClaimTypes.Role, role.Name));
         }
         
         var tokenDescriptor = new SecurityTokenDescriptor
