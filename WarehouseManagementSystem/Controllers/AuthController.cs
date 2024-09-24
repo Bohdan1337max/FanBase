@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using WarehouseManagementSystem.DataBase;
 using WarehouseManagementSystem.DataTransferModels;
 using WarehouseManagementSystem.Models;
@@ -13,17 +15,20 @@ namespace WarehouseManagementSystem.Controllers;
 public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepository) : ControllerBase
 {
     [HttpPost("signUp")]
-    public IActionResult SignUp(SignUpRequest user)
+    public IActionResult SignUp([FromBody]SignUpRequest user)
     {
         var jwt = authRepository.RegisterNewUser(user.Email, user.UserName, user.Password);
-        if (jwt == null)
+        if (jwt == null) 
             return BadRequest("User already exist");
 
-        return Ok(jwt);
+        return Ok(new 
+        {
+            Token = jwt
+        });
     }
-
+    
     [HttpPost("logIn")]
-    public IActionResult LogIn(LogInRequest user)
+    public IActionResult LogIn([FromBody]LogInRequest user)
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == user.Email);
 
@@ -34,12 +39,17 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         if (jwt == null)
             return BadRequest("Password sucks");
 
-        return Ok(jwt);
+        return Ok(new 
+        {
+            Token = jwt
+        });
     }
 
+    [Authorize]
     [HttpGet("showUserInfo")]
-    public IActionResult ShowAuthUserData(string email)
+    public IActionResult ShowAuthUserData()
     {
+        var email = User.Claims.FirstOrDefault( x => x.Type == ClaimTypes.Email)!.Value;
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
         if (userFromDb == null)
             return BadRequest("User with this Id doesnt exist");
@@ -80,5 +90,11 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
             return NotFound("Role with this name don't exist");
         var roles = addedUserRole.Select(r => new AssignRoleResponse() { Id = r.Id, Name = r.Name }).ToList();
         return Ok(roles);
+    }
+
+    [HttpGet]
+    public IActionResult Test()
+    {
+        return Ok("""{"text": "izi"}""");
     }
 }

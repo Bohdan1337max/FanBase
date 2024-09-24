@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using WarehouseManagementSystem.DataBase;
 using WarehouseManagementSystem.DataTransferModels;
 using WarehouseManagementSystem.Models;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace WarehouseManagementSystem.Repositories;
 
@@ -104,7 +105,8 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Email, email),
+            new (ClaimTypes.Email, email),
+            
         };
 
         

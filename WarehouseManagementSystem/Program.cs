@@ -28,9 +28,13 @@ builder.Services.AddControllers().AddJsonOptions(options =>  options.JsonSeriali
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors( x => x.AddPolicy("AllowSpecificOrigins", b => b.WithOrigins("http://localhost:3000")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()));
+
 builder.Services.AddDbContext<WmsDbContext>(
     o => o.UseNpgsql(builder.Configuration.GetConnectionString("wms_project_db")));
-builder.Services.AddScoped<ItemController>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 var app = builder.Build();
@@ -46,7 +50,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors("AllowSpecificOrigins");
 app.MapControllers();
 
 app.Run();
