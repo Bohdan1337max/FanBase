@@ -12,7 +12,7 @@ using WarehouseManagementSystem.Repositories;
 namespace WarehouseManagementSystem.Controllers;
 
 [Route("api/auth")]
-public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepository) : ControllerBase
+public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepository,IWebHostEnvironment env) : ControllerBase
 {
     [HttpPost("signUp")]
     public IActionResult SignUp([FromBody]SignUpRequest user)
@@ -53,12 +53,15 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
         if (userFromDb == null)
             return BadRequest("User with this Id doesnt exist");
-
+        
+        
         var response = new UserInfoResponse()
         {
             Id = userFromDb.Id,
             UserName = userFromDb.UserName,
             Email = userFromDb.Email,
+            Bio = userFromDb.Bio,
+            ProfileImageUrl = userFromDb.ProfileImageUrl
         };
         return Ok(response);
     }

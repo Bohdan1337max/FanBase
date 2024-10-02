@@ -44,7 +44,6 @@ const LoginPage = () => {
     return (
         <div className="login-container">
             <form onSubmit={handleSubmit}>
-                {console.log(localStorage.getItem('jwtToken'))}
                 <h2>Login</h2>
                 {error && <p style={{color: 'red'}}>{error}</p>}
                 {isLoading && <p>Loading...</p>}
