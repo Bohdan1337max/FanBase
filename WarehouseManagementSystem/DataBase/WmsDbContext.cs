@@ -10,7 +10,8 @@ public class WmsDbContext(DbContextOptions<WmsDbContext> options) : DbContext(op
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<SubscriptionTier> SubscriptionTiers { get; set; }
     public DbSet<Subscription> Subscriptions { get; set; }
-    
+    public DbSet<Post> Posts { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.LogTo(
@@ -22,7 +23,5 @@ public class WmsDbContext(DbContextOptions<WmsDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
     }
-    
 }

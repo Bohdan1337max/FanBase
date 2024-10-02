@@ -12,7 +12,7 @@ using WarehouseManagementSystem.Repositories;
 namespace WarehouseManagementSystem.Controllers;
 
 [Route("api/auth")]
-public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepository,IWebHostEnvironment env) : ControllerBase
+public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepository) : ControllerBase
 {
     [HttpPost("signUp")]
     public IActionResult SignUp([FromBody]SignUpRequest user)
