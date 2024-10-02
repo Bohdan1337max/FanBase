@@ -114,7 +114,8 @@ typings/
 # dotenv environment variables file
 .env
 
-
+appsettings.json
+appsettings.Development.json
 
 .travis/README.md
 .travis/scripts
