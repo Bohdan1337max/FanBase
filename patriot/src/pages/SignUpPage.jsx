@@ -33,16 +33,11 @@ const SignUpPage = () => {
             console.error(await response.json());
 
         const data = await response.json();
-        console.log(data)
 
         const token = data.token;
 
-        console.log(token)
         localStorage.setItem('jwtToken', token);
-
-        const storedToken = localStorage.getItem('jwtToken');
-
-        console.log(storedToken)
+        navigate('/')
 
     }
 

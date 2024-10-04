@@ -82,8 +82,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         wmsDbContext.SaveChanges();
         return Ok($"Role {roleName} successfully created");
     }
-
-    //add roles to header   
+    
     [HttpPost("assignRole")]
     public IActionResult AssignRole(int userId, string role)
     {

@@ -66,9 +66,9 @@ const LoginPage = () => {
                         required
                     />
                 </div>
-                <div>
+                <div className={"control-container"}>
                     <button onClick={logInButtonHandle} type={"submit"}>Login</button>
-                    <button className={"control-container"} onClick={signUpButtonHandle}>Sign Up</button>
+                    <button  onClick={signUpButtonHandle}>Sign Up</button>
                 </div>
             </form>
         </div>

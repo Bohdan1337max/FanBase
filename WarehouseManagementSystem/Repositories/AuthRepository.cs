@@ -61,21 +61,25 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         
         var assignedRole= AssignUserRole(newUser.Id, defaultUserRole.Name);
         
-        var jwt = GenerateToken(email, assignedRole);
+        var jwt = GenerateToken(newUser.Id,email, assignedRole);
         return jwt;
     }
 
     public string? LogIn(string email, string password)
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == email);
-        var addedUserRole = wmsDbContext.UserRoles.Where(u => u.UserId == userFromDb.Id).Include(x => x.Role).Select(x => x.Role).ToList();
+        var addedUserRole = wmsDbContext.UserRoles
+            .Where(u => u.UserId == userFromDb.Id)
+            .Include(x => x.Role)
+            .Select(x => x.Role)
+            .ToList();
         
         //var roles = addedUserRole.Select(r => r.Name).ToList();
 
 
         return !VerifyPassword(password, userFromDb.Password, Convert.FromHexString(userFromDb.Salt))
             ? null
-            : GenerateToken(email, addedUserRole);
+            : GenerateToken(userFromDb.Id,email, addedUserRole);
     }
 
     private string HashPassword(string password, out byte[] salt)
@@ -98,7 +102,7 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         return CryptographicOperations.FixedTimeEquals(hashToCompere, Convert.FromHexString(hash));
     }
 
-    private string GenerateToken(string email, List<Role> roles)
+    private string GenerateToken(int id, string email, List<Role> roles)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!);
@@ -106,7 +110,7 @@ public class AuthRepository(WmsDbContext wmsDbContext, IConfiguration configurat
         var claims = new List<Claim>
         {
             new (ClaimTypes.Email, email),
-            
+            new (ClaimTypes.NameIdentifier, id.ToString())
         };
 
         

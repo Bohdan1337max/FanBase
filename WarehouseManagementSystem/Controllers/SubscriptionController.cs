@@ -24,7 +24,8 @@ public class SubscriptionController(WmsDbContext wmsDbContext) : ControllerBase
         wmsDbContext.SaveChanges();
         return Ok();
     }
-
+    
+    [Authorize]
     [HttpPost("subscribe")]
     public IActionResult Subscribe([FromBody]SubscriptionRequest subscriptionRequest)
     {
@@ -55,7 +56,7 @@ public class SubscriptionController(WmsDbContext wmsDbContext) : ControllerBase
         return Ok(subscription);
     }
     
-    [Authorize]
+    
     [HttpGet("getTiers")]
     public IActionResult GetCreatorSubscriptionTiers([FromQuery]int creatorId)
     {
