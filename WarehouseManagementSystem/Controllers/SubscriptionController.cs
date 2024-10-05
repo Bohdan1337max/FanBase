@@ -25,6 +25,7 @@ public class SubscriptionController(WmsDbContext wmsDbContext) : ControllerBase
         return Ok();
     }
     
+    //TODO Bed Request with TierId
     [Authorize]
     [HttpPost("subscribe")]
     public IActionResult Subscribe([FromBody]SubscriptionRequest subscriptionRequest)

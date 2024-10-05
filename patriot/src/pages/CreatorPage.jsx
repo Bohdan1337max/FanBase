@@ -4,11 +4,10 @@ import SubscriptionTierCard from "../components/SubscriptionTierCard";
 
 const CreatorPage = () => {
     const {state} = useLocation();
-    const {creator} = state || {}; // Access the passed creator data
+    const {creator} = state || {};
     const [tiers, setTiers] = useState([]);
 
     useEffect(() => {
-        {console.log(state)}
         if (creator) {
             const fetchTiers = async () => {
                 try {
@@ -50,7 +49,7 @@ const CreatorPage = () => {
             <div>
                 {tiers.length > 0 ? (
                     tiers.map((tier) => (
-                        <SubscriptionTierCard key={tier.id} tier={tier}/>
+                        <SubscriptionTierCard key={tier.id} tier={tier} creator={creator}/>
                     ))
                 ) : (
                     <p>No subscription tiers available for this creator.</p>

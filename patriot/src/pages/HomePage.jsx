@@ -6,10 +6,11 @@ const HomePage = () => {
     const [creators, setCreators] = useState([]);
     const navigate = useNavigate();
 
+
     useEffect(() => {
         const fetchCreators = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/content/creators');
+                const response = await fetch('http://localhost:5000/api/creator/getCreators');
                 if (!response.ok) {
                     throw new Error('Failed to fetch creator data');
                 }

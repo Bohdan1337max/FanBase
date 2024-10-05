@@ -1,15 +1,46 @@
-const SubscriptionTierCard = ({tier}) => {
+import {jwtDecode} from "jwt-decode";
 
-    const handleJoinButton = () =>
-    {
+const SubscriptionTierCard = ({tier, creator}) => {
+    const subscribeUrl = 'http://localhost:5000/api/subscription/subscribe'
+    const storedToken = localStorage.getItem('jwtToken')
+    const decodedToken = jwtDecode(storedToken);
+    const userId = decodedToken.nameid;
+    const currentDate = new Date().toISOString();
+    console.log("Tier is:" ,tier, "Creator is: ",creator, "UserId is :", userId, "CurrentDate is :",currentDate)
+    const requestOption = {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${storedToken}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            subscriberId: userId,
+            creatorId: creator.id,
+            tierId: tier.id,
+            startDate: currentDate
+        })
+    }
 
+
+    const handleJoinButton = async () => {
+        try {
+            const response = await fetch(subscribeUrl,requestOption);
+            if (!response.ok) {
+                throw new Error("Cant subscribe")
+            }
+            const data =  await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error("Fail to subscribe", error)
+        }
     }
     return (
         <div>
             <h3>{tier.name}</h3>
             <p>{tier.description}</p>
             <p>Price: ${tier.price}</p>
-            <button>Join</button>
+            <button onClick={handleJoinButton}>Join</button>
         </div>
 
     )
