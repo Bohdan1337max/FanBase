@@ -10,7 +10,7 @@ const HomePage = () => {
     useEffect(() => {
         const fetchCreators = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/creator/getCreators');
+                const response = await fetch('http://localhost:5000/api/creators');
                 if (!response.ok) {
                     throw new Error('Failed to fetch creator data');
                 }

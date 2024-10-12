@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -7,10 +8,10 @@ using WarehouseManagementSystem.Models;
 
 namespace WarehouseManagementSystem.Controllers;
 
-[Route("api/subscription")]
+[Route("api/subscriptions")]
 public class SubscriptionController(WmsDbContext wmsDbContext) : ControllerBase
 {
-    [HttpPost("createTier")]
+    [HttpPost("tiers")]
     public IActionResult CreateSubscriptionTier([FromBody]CreateSubscriptionTierRequest subscriptionTierRequest)
     {
         var subscriptionTier = new SubscriptionTier()
@@ -27,27 +28,28 @@ public class SubscriptionController(WmsDbContext wmsDbContext) : ControllerBase
     
     //TODO Bed Request with TierId
     [Authorize]
-    [HttpPost("subscribe")]
+    [HttpPost]
     public IActionResult Subscribe([FromBody]SubscriptionRequest subscriptionRequest)
     {
-        var subscriberFromDb = wmsDbContext.Users
-            .FirstOrDefault(x => x.Id == subscriptionRequest.SubscriberId);
-        if (subscriberFromDb == null)
-            return BadRequest("Subscriber not found");
+        //var subscriptionFromDb = wmsDbContext.Subscriptions.FirstOrDefault( x => x.Id ==)
+        var email = User.Claims.FirstOrDefault( x => x.Type == ClaimTypes.Email)!.Value;
+        var subscriberFromDb = wmsDbContext.Users.First(x => x.Email == email);
         var creatorFromDb = wmsDbContext.Users
             .FirstOrDefault(x => x.Id == subscriptionRequest.CreatorId);
         if (creatorFromDb == null)
             return BadRequest("Creator Not Found");
-        var tierFormDb = wmsDbContext.SubscriptionTiers
+        var tierFromDb = wmsDbContext.SubscriptionTiers
             .FirstOrDefault(x => x.Id == subscriptionRequest.SubscriptionTierId);
-        if (tierFormDb == null)
+        if (tierFromDb == null)
             return BadRequest("Subscription Tier Not Found");
 
+        subscriptionRequest.EndDate ??= subscriptionRequest.StartDate + TimeSpan.FromDays(30);
+        
         var subscription = new Subscription()
         {
             SubscriberId = subscriberFromDb.Id,
             CreatorId = creatorFromDb.Id,
-            SubscriptionTierId = tierFormDb.Id,
+            SubscriptionTierId = tierFromDb.Id,
             StartDate = subscriptionRequest.StartDate,
             EndDate = subscriptionRequest.EndDate
         };
@@ -58,7 +60,7 @@ public class SubscriptionController(WmsDbContext wmsDbContext) : ControllerBase
     }
     
     
-    [HttpGet("getTiers")]
+    [HttpGet("tiers")]
     public IActionResult GetCreatorSubscriptionTiers([FromQuery]int creatorId)
     {
        var creatorFromDb = wmsDbContext.Users

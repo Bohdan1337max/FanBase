@@ -7,7 +7,7 @@ const SignUpPage = () => {
     const [password, setPassword] = useState('');
     const [userName, setUserName] = useState('');
     const [userData, setUserData] = useState();
-    const apiUrl = "http://localhost:5000/api/auth/signUp";
+    const apiUrl = "http://localhost:5000/api/auth/sign-up";
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {

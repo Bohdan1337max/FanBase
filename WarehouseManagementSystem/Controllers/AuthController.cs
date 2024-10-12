@@ -14,7 +14,7 @@ namespace WarehouseManagementSystem.Controllers;
 [Route("api/auth")]
 public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepository) : ControllerBase
 {
-    [HttpPost("signUp")]
+    [HttpPost("sign-up")]
     public IActionResult SignUp([FromBody]SignUpRequest user)
     {
         var jwt = authRepository.RegisterNewUser(user.Email, user.UserName, user.Password);
@@ -27,7 +27,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         });
     }
     
-    [HttpPost("logIn")]
+    [HttpPost("log-in")]
     public IActionResult LogIn([FromBody]LogInRequest user)
     {
         var userFromDb = wmsDbContext.Users.FirstOrDefault(u => u.Email == user.Email);
@@ -46,7 +46,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
     }
 
     [Authorize]
-    [HttpGet("showUserInfo")]
+    [HttpGet("show-user-info")]
     public IActionResult ShowAuthUserData()
     {
         var email = User.Claims.FirstOrDefault( x => x.Type == ClaimTypes.Email)!.Value;
@@ -67,7 +67,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
     }
 
     [Authorize(Roles = "SuperAdmin")]
-    [HttpPost("roleCreate")]
+    [HttpPost("role-create")]
     public IActionResult CreateRole(string roleName)
     {
         var roleFromDb = wmsDbContext.Roles.FirstOrDefault(r => r.Name == roleName);
@@ -83,7 +83,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         return Ok($"Role {roleName} successfully created");
     }
     
-    [HttpPost("assignRole")]
+    [HttpPost("assign-role")]
     public IActionResult AssignRole(int userId, string role)
     {
         var addedUserRole = authRepository.AssignUserRole(userId, role);

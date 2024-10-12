@@ -7,7 +7,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const apiUrl = 'http://localhost:5000/api/auth/logIn'
+    const apiUrl = 'http://localhost:5000/api/auth/log-in'
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();

@@ -13,7 +13,7 @@ const AccountPage = () => {
         if (storedToken) {
             const fetchData = async () => {
                 try {
-                    const response = await fetch('http://localhost:5000/api/auth/showUserInfo', {
+                    const response = await fetch('http://localhost:5000/api/auth/show-user-info', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${storedToken}`,
@@ -26,7 +26,7 @@ const AccountPage = () => {
                     const data = await response.json();
                     setAccountData(data);
                     console.log(data.id)
-                    const tiersResponse = await fetch(`http://localhost:5000/api/subscription/getTiers?creatorId=${data.id}`, {
+                    const tiersResponse = await fetch(`http://localhost:5000/api/subscriptions/tiers?creatorId=${data.id}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${storedToken}`,
@@ -59,11 +59,10 @@ const AccountPage = () => {
             <div>
                 <h1>Account Page</h1>
                 <img src={`http://localhost:5000${accountData.profileImageUrl}`} alt="Profile"
-                     style={{width: '200px', height: '200px'}}/>
+                     style={{width: '200px', height: '200px', }}/>
                 <p>{accountData.userName}</p>
                 <p>{accountData.email}</p>
                 <p>{accountData.bio}</p>
-
             </div>
             <div>
                 <h3>Subscription Tiers</h3>

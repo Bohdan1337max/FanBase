@@ -4,18 +4,18 @@ using WarehouseManagementSystem.DataTransferModels;
 
 namespace WarehouseManagementSystem.Controllers;
 
-[Route("api/creator")]
+[Route("api/creators")]
 public class CreatorController(WmsDbContext wmsDbContext) : ControllerBase
 {
 
-    [HttpGet("getSubscribers")]
+    [HttpGet("subscribers")]
     public IActionResult GetSubscribers([FromQuery]int creatorId)
     {
         var subs = wmsDbContext.Subscriptions.Where(x => x.CreatorId == creatorId).ToList();
         return Ok(subs);
     }
     
-    [HttpGet("getCreators")]
+    [HttpGet]
     public IActionResult GetCreators()
     {
         var creators = wmsDbContext.Users

@@ -1,7 +1,7 @@
 import {jwtDecode} from "jwt-decode";
 
 const SubscriptionTierCard = ({tier, creator}) => {
-    const subscribeUrl = 'http://localhost:5000/api/subscription/subscribe'
+    const subscribeUrl = 'http://localhost:5000/api/subscriptions'
     const storedToken = localStorage.getItem('jwtToken')
     const decodedToken = jwtDecode(storedToken);
     const userId = decodedToken.nameid;
@@ -17,7 +17,7 @@ const SubscriptionTierCard = ({tier, creator}) => {
         body: JSON.stringify({
             subscriberId: userId,
             creatorId: creator.id,
-            tierId: tier.id,
+            subscriptionTierId: tier.id,
             startDate: currentDate
         })
     }
@@ -36,15 +36,13 @@ const SubscriptionTierCard = ({tier, creator}) => {
         }
     }
     return (
-        <div>
+        <div style={{border: "solid black 2px",borderRadius: "10px", padding: "2rem", width:"10rem", display:"flex", flexDirection:"column", alignItems:"center"}}>
             <h3>{tier.name}</h3>
             <p>{tier.description}</p>
             <p>Price: ${tier.price}</p>
             <button onClick={handleJoinButton}>Join</button>
         </div>
-
     )
-
 }
 
 export default SubscriptionTierCard;
