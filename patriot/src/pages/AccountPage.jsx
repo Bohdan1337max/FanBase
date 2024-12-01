@@ -5,7 +5,6 @@ import {useNavigate} from "react-router-dom";
 const AccountPage = () => {
     const [accountData, setAccountData] = useState(null);
     const [tiersData, setTiersData] = useState([]);
-    const navigate = useNavigate();
     const storedToken = localStorage.getItem('jwtToken');
     console.log(storedToken)
 
@@ -46,53 +45,98 @@ const AccountPage = () => {
         }
     }, [storedToken]);
 
-    const handleLogoutButton = () => {
-        Logout();
-        navigate('/')
-    }
+
     if (!accountData) {
         return <div>Loading...</div>;
     }
 
     return (
         <div>
-            <div>
-                <h1>Account Page</h1>
+            <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+
+                <h1 style={{alignSelf: "self-start"}}>Account Page</h1>
+
                 <img src={`http://localhost:5000${accountData.profileImageUrl}`} alt="Profile"
-                     style={{width: '200px', height: '200px', }}/>
-                <p>{accountData.userName}</p>
-                <p>{accountData.email}</p>
-                <p>{accountData.bio}</p>
+                     style={{width: '200px', height: '200px', marginBottom:"20px"}}/>
+
+                <div style={{width: "500px"}}>
+
+                    <div style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        marginBottom: "10px"
+                    }}>
+                        <div>
+                            <div>Account name:</div>
+                            <div>{accountData.userName}</div>
+                        </div>
+                        <button>Edit</button>
+                    </div>
+
+                    <div style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        marginBottom: "10px"
+                    }}>
+                        <div>
+                            <div>Email:</div>
+                            <div>{accountData.email}</div>
+                        </div>
+
+                        <button>Edit</button>
+                    </div>
+
+                    <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                        <div>
+                            <div>Description:</div>
+                            <div>{accountData.bio}</div>
+                        </div>
+                        <button> Edit</button>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h3>Subscription Tiers</h3>
-                {tiersData.length === 0 ? (
-                    <p>No tiers available</p>
-                ) : (
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Price</th>
-                            <th>Description</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {tiersData.map(tier => (
-                            <tr key={tier.id}>
-                                <td>{tier.name}</td>
-                                <td>{tier.price}</td>
-                                <td>{tier.description}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
-            <button onClick={handleLogoutButton}> Log out</button>
+            <SubscriptionTiers tiersData={tiersData}></SubscriptionTiers>
         </div>
     )
 }
 
+const SubscriptionTiers = ({tiersData}) => {
+
+    const navigate = useNavigate();
+    const handleLogoutButton = () => {
+        Logout();
+        navigate('/')
+    }
+    return (
+        <div>
+            <h3>Subscription Tiers</h3>
+            {tiersData.length === 0 ? (
+                <p>No tiers available</p>
+            ) : (
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {tiersData.map(tier => (
+                        <tr key={tier.id}>
+                            <td>{tier.name}</td>
+                            <td>{tier.price}</td>
+                            <td>{tier.description}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
+            <button onClick={handleLogoutButton}> Log out</button>
+        </div>
+    )
+}
 
 export default AccountPage

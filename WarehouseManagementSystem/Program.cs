@@ -34,7 +34,10 @@ builder.Services.AddCors( x => x.AddPolicy("AllowSpecificOrigins", b => b.WithOr
     .AllowCredentials()));
 
 builder.Services.AddDbContext<WmsDbContext>(
-    o => o.UseNpgsql(builder.Configuration.GetConnectionString("wms_project_db")));
+    o => o.UseNpgsql(builder.Configuration.GetConnectionString("patriot")));
+builder.Services.AddDbContext<MigrationDbContext>(o =>
+    o.UseNpgsql(builder.Configuration.GetConnectionString("patriot")));
+
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 var app = builder.Build();

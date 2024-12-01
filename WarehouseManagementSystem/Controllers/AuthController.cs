@@ -21,7 +21,7 @@ public class AuthController(WmsDbContext wmsDbContext, IAuthRepository authRepos
         if (jwt == null) 
             return BadRequest("User already exist");
 
-        return Ok(new 
+        return Ok(new SignUpResponse()  
         {
             Token = jwt
         });
